@@ -5,13 +5,17 @@ const path = require('path');
 const session = require('express-session');
 const nunjucks = require('nunjucks');
 const dotenv = require('dotenv');
+const passport = require('passport');
 
 dotenv.config();
 
 const pageRouter = require('./routes/page');
+const authRouter = require('./routes/auth');
 const { sequelize } = require('./models');
+const passportConfig = require('./passport');
 
 const app = express();
+passportConfig();
 
 app.set('port', process.env.PORT || 8080);
 app.set('view engine', 'html');
@@ -46,10 +50,15 @@ app.use(
   })
 );
 
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use('/', pageRouter);
+app.use('/auth/', authRouter);
 
 app.use((req, res, next) => {
   const error = new Error(`${req.method} ${req.url} 라우터가 없습니다`);
+  console.error(error);
   error.status = 404;
   next(error);
 });
