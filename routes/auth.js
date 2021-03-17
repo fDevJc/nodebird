@@ -1,15 +1,10 @@
 const express = require('express');
 const passport = require('passport');
-const bcypt = require('bcrypt');
+const bcrypt = require('bcrypt');
 const { isLoggedIn, isNotLoggedIn } = require('./middlewares');
 const User = require('../models/user');
 
 const router = express.Router();
-
-router.use('/', (res, req, next) => {
-  console.log('auth router : ', req.method, req.url);
-  next();
-});
 
 router.post('/join', isNotLoggedIn, async (req, res, next) => {
   const { email, nick, password } = req.body;
@@ -27,15 +22,16 @@ router.post('/join', isNotLoggedIn, async (req, res, next) => {
     });
     return res.redirect('/');
   } catch (err) {
-    console.error('routes/auth join err :', err);
+    console.error('>>>>>>>>>>routes/auth join err :', err);
     return next(error);
   }
 });
-
-router.post('/login', isNotLoggedIn, (res, req, next) => {
-  passport.authenticate('local', (authError, user, info) => {
+router.post('/login', isNotLoggedIn, (req, res, next) => {
+	console.log('auth.js >>>>>>');
+	passport.authenticate('local', (authError, user, info) => {
+					console.log('>>>>>>>>>>>>',user);
     if (authError) {
-      console.error('routes/auth login autherr :', authError);
+      console.error(authError);
       return next(authError);
     }
     if (!user) {
@@ -43,12 +39,12 @@ router.post('/login', isNotLoggedIn, (res, req, next) => {
     }
     return req.login(user, (loginError) => {
       if (loginError) {
-        console.error('routes/auth login err :', loginError);
+        console.error(loginError);
         return next(loginError);
       }
       return res.redirect('/');
     });
-  })(req, res, next);
+  })(req, res, next); // 미들웨어 내의 미들웨어에는 (req, res, next)를 붙입니다.
 });
 
 router.get('/logout', isLoggedIn, (req, res) => {

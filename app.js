@@ -20,7 +20,7 @@ const passportConfig = require('./passport');
 const app = express();
 passportConfig();
 
-app.set('port', process.env.PORT || 8080);
+app.set('port', process.env.PORT || 8082);
 app.set('view engine', 'html');
 nunjucks.configure('views', {
   express: app,
@@ -70,7 +70,7 @@ app.use((req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  console.log('app/err : ', err);
+  console.log('>>>>>>>app/err : ', err);
   res.locals.message = err.message;
   res.locals.error = process.env.NODE_ENV !== 'prodcution' ? err : {};
   res.status(err.status || 500);
